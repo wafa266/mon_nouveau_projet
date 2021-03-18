@@ -47,7 +47,7 @@ class Categorie
         return $this;
     }
     /**
-     * @ORM\OneToMany(targetEntity="Produits", mappedBy="cat", cascade="all", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="Produits", mappedBy="cat")
      */
     private $products;
 
@@ -57,13 +57,35 @@ class Categorie
     }
 
     /**
-     * @return Collection|Product[]
+     * @return Collection|Products[]
      */
     public function getProducts(): Collection
     {
         return $this->products;
     }
 
+    public function addProduct(Produits $product): self
+    {
+        if (!$this->products->contains($product)) {
+            $this->products[] = $product;
+            $product->setCat($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProduct(Produits $product): self
+    {
+        if ($this->products->contains($product)) {
+            $this->products->removeElement($product);
+            // set the owning side to null (unless already changed)
+            if ($product->getCat() === $this) {
+                $product->setCat(null);
+            }
+        }
+
+        return $this;
+    }
     public function __toString()
     {
         return $this->nom;
